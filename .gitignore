@@ -2,3 +2,4 @@
 cmake-build-debug/
 CMakeLists.txt
 red-blue-points/program
+.DS_Store
