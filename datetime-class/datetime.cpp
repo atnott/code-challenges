@@ -150,3 +150,30 @@ std::string date_time::get_day_of_week() const {
     int jdn = static_cast<int>(this->to_jdn());
     return days[jdn % 7];
 }
+
+std::ostream& operator << (std::ostream& os, const date_time& dt) {
+    static const std::string months[] = {
+        "января",
+        "февраля",
+        "марта",
+        "апреля",
+        "мая",
+        "июня",
+        "июля",
+        "августа",
+        "сентября",
+        "октября",
+        "ноября",
+        "декабря"
+    };
+    os << dt.day << ' ' << months[dt.month - 1] << ' ' << dt.year << " года";
+    return os;
+}
+
+std::istream& operator >> (std::istream& is, date_time& dt) {
+    std::string line;
+    if (is >> line) {
+        dt = date_time(line);
+    }
+    return is;
+}

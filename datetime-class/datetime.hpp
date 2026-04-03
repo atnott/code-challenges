@@ -10,7 +10,7 @@ private:
     static date_time from_jdn(double jdn);
 public:
     date_time();
-    date_time(int year, int month, int day, int hour, int minute, int second);
+    date_time(int year, int month, int day, int hour = 0, int minute = 0, int second = 0);
     date_time(std::string str);
 
     bool is_valid() const;
@@ -26,5 +26,8 @@ public:
     double operator - (const date_time& other) const;
 
     std::string get_day_of_week() const;
+
+    friend std::ostream& operator << (std::ostream& os, const date_time& dt);
+    friend std::istream& operator >> (std::istream& is, date_time& dt);
 };
 
