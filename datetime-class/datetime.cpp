@@ -48,3 +48,27 @@ bool date_time::is_valid() const {
     if (day < 1 || day > days_in_month[month - 1]) return false;
     return true;
 }
+
+double date_time::to_jdn() const {
+    int a = (14 - month) / 12;
+    int y = year + 4800 - a;
+    int m = month + 12 * a - 3;
+    double jdn = day + (153 * m + 2) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 32045;
+    return jdn + (hour / 24.0) + (minute / 1440.0) + (second / 86400.0);
+}
+
+bool date_time::operator < (const date_time& other) const {
+    return this->to_jdn() < other.to_jdn();
+}
+
+bool date_time::operator > (const date_time& other) const {
+    return other < *this;
+}
+
+bool date_time::operator == (const date_time& other) const {
+    return this->to_jdn() == other.to_jdn();
+}
+
+bool date_time::operator != (const date_time& other) const {
+    return !(*this == other);
+}
