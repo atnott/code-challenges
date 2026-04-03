@@ -9,7 +9,13 @@ date_time::date_time() {
     second = 0;
 }
 
-date_time::date_time(int year, int month, int day, int hour, int minute, int second) : year(year), month(month), day(day), hour(hour), minute(minute), second(second) {}
+date_time::date_time(int year, int month, int day, int hour, int minute, int second) : year(year), month(month), day(day), hour(hour), minute(minute), second(second) {
+    if (!is_valid()) {
+        std::cerr << "invalid date! resetting to 2026-01-01" << std::endl;
+        this->year = 2026; this->month = 1; this->day = 1;
+        this->hour = 0; this->minute = 0; this->second = 0;
+    }
+}
 
 date_time::date_time(std::string str) {
     std::string arr[6]{"", "", "", "", "", ""};
@@ -71,4 +77,47 @@ bool date_time::operator == (const date_time& other) const {
 
 bool date_time::operator != (const date_time& other) const {
     return !(*this == other);
+}
+
+date_time date_time::from_jdn(double jdn) {
+    int int_jdn = static_cast<int>(jdn);
+    double fractional_jdn = jdn - int_jdn;
+
+    int f = int_jdn + 1401 + ((3 * (4 * int_jdn + 274277) / 146097) / 4) - 38;
+    int e = f * 4 + 3;
+    int g = (e % 1461) / 4;
+    int h = 5 * g + 2;
+
+    int d = (h % 153) / 5 + 1;
+    int m = ((h / 153) + 2) % 12 + 1;
+    int y = (e / 1461) - 4716 + (14 - m) / 12;
+
+    int total_seconds = std::round(fractional_jdn * 86400);
+    int hours = total_seconds / 3600;
+    int minutes = (total_seconds % 3600) / 60;
+    int seconds = total_seconds % 60;
+
+    return date_time(y, m, d, hours, minutes, seconds);
+}
+
+date_time date_time::operator + (double days) const {
+    double jdn = this->to_jdn();
+    double result = jdn + days;
+    return from_jdn(result);
+}
+
+void date_time::print() const {
+    std::cout << year << '.' << month << '.' << day << 'T' << hour << ':' << minute << ':' << second << std::endl;
+}
+
+date_time date_time::operator - (double days) const {
+    double jdn = this->to_jdn();
+    double result = jdn - days;
+    return from_jdn(result);
+}
+
+double date_time::operator - (const date_time& other) const {
+    double jdn1 = this->to_jdn();
+    double jdn2 = other.to_jdn();
+    return std::abs(jdn1 - jdn2);
 }
