@@ -4,19 +4,12 @@
 
 class date_time {
 private:
-    int year, month, day;
+    int year, month, day, hour, minute, second;
 public:
     date_time();
-    date_time(int year, int month, int day);
+    date_time(int year, int month, int day, int hour, int minute, int second);
     date_time(std::string str);
 
     bool is_valid() const;
-
-    void print();
-    int change_day() const;
-    static date_time reverse_change(int jdn);
-
-    int operator - (const date_time &other);
-    friend std::ostream& operator<<(std::ostream& os, const date_time& dt);
 };
 
