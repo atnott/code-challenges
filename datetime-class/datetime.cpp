@@ -106,8 +106,23 @@ date_time date_time::operator + (double days) const {
     return from_jdn(result);
 }
 
-void date_time::print() const {
-    std::cout << year << '.' << month << '.' << day << 'T' << hour << ':' << minute << ':' << second << std::endl;
+void date_time::print() const{
+    std::cout << year << "-";
+    for_print(month);
+    std::cout << "-";
+    for_print(day);
+    std::cout << "T";
+    for_print(hour);
+    std::cout << ":";
+    for_print(minute);
+    std::cout << ":";
+    for_print(second);
+    std::cout << std::endl;
+}
+
+void date_time::for_print(int temp) const{
+    if (temp < 10) std::cout << 0;
+    std::cout << temp;
 }
 
 date_time date_time::operator - (double days) const {
@@ -120,4 +135,18 @@ double date_time::operator - (const date_time& other) const {
     double jdn1 = this->to_jdn();
     double jdn2 = other.to_jdn();
     return std::abs(jdn1 - jdn2);
+}
+
+std::string date_time::get_day_of_week() const {
+    static std::string days[] = {
+        "Понедельник",
+        "Вторник",
+        "Среда",
+        "Четверг",
+        "Пятница",
+        "Суббота",
+        "Воскресенье"
+    };
+    int jdn = static_cast<int>(this->to_jdn());
+    return days[jdn % 7];
 }

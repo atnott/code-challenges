@@ -29,5 +29,9 @@ int main() {
     double result5 = (test3 - test1);
     cout << result5 << endl; // разница в количестве дней между двумя датами
 
+    date_time today("2026-04-03T17:31:00");
+    string day_of_week = today.get_day_of_week();
+    cout << day_of_week << endl;
+
     return 0;
 }

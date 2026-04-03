@@ -5,6 +5,7 @@
 class date_time {
 private:
     int year, month, day, hour, minute, second;
+    void for_print(int temp) const;
     double to_jdn() const;
     static date_time from_jdn(double jdn);
 public:
@@ -23,5 +24,7 @@ public:
     date_time operator + (double days) const;
     date_time operator - (double days) const;
     double operator - (const date_time& other) const;
+
+    std::string get_day_of_week() const;
 };
 
