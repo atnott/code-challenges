@@ -1,4 +1,5 @@
 import sqlite3 as sql
+from all_data.data import levels, directions, types, students_data
 
 def print_answer(ans):
     print(ans, '\n', '=' * 50)
@@ -40,37 +41,6 @@ with sql.connect("database.db") as connection:
     FOREIGN KEY (id_direction) REFERENCES direction (id_direction),
     FOREIGN KEY (id_type) REFERENCES type_of_training (id_type)
     );''')
-
-    levels = [
-        (1, 'Бакалавриат'),
-        (2, 'Магистратура')
-    ]
-
-    directions = [
-        (1, 'Прикладная информатика'),
-        (2, 'Реклама и связь с общественностью'),
-        (3, 'Туризм'),
-        (4, 'Дизайн'),
-    ]
-
-    types = [
-        (1, 'Очная'),
-        (2, 'Заочная'),
-        (3, 'Вечерняя')
-    ]
-
-    students_data = [
-        (1, 1, 1, 1, 'Krotov', 'Anton', 'Dmitrievich', 72),
-        (2, 1, 1, 3, 'Krotov', 'Igor', 'Olegovich', 85),
-        (3, 2, 2, 1, 'Ivanova', 'Maria', 'Sergeevna', 94),
-        (4, 1, 3, 1, 'Ivanov', 'Petr', 'Petrovich', 65),
-        (5, 1, 3, 1, 'Ivanov', 'Petr', 'Petrovich', 70),
-        (6, 2, 1, 2, 'Sidorov', 'Dmitry', 'Ivanovich', 88),
-        (7, 1, 1, 1, 'Smirnov', 'Alexey', 'Petrovich', 95),
-        (8, 1, 1, 1, 'Volkova', 'Elena', 'Igorevna', 92),
-        (9, 1, 1, 1, 'Kuznetsov', 'Pavel', 'Andreevich', 88),
-        (10, 1, 1, 1, 'Lebedeva', 'Anna', 'Viktorovna', 98)
-    ]
 
     cursor.executemany('INSERT OR IGNORE INTO level_of_study VALUES(?, ?)', levels)
     cursor.executemany('INSERT OR IGNORE INTO direction VALUES(?, ?)', directions)
@@ -141,3 +111,96 @@ with sql.connect("database.db") as connection:
     ''')
     answer = cursor.fetchall()
     print('Количество полных тезок: ', len(answer), '\n', '\n'.join(' '.join(line) for line in answer))
+    print_answer('')
+
+    '''Добавление новой колонки "Статус ученика"'''
+    cursor.execute('''
+    SELECT
+        last_name,
+        first_name,
+        avg_mark,
+        CASE
+            WHEN avg_mark > 80 THEN 'A'
+            WHEN avg_mark > 60 AND avg_mark <= 80 THEN 'B'
+            ELSE 'C'
+        END status
+    FROM students;
+    ''')
+    for row in cursor.fetchall():
+        print(*row, sep=' | '.rjust(10))
+    print_answer('')
+
+    '''Получение количества студентов на каждом направлении, балл которых больше заданного'''
+    min_mark = (80, )
+    cursor.execute('''
+    SELECT name_direction, COUNT(*) as total_students,
+    SUM(CASE WHEN students.avg_mark > ? THEN 1 ELSE 0 END) as high_achievers
+    FROM students
+    JOIN direction ON students.id_direction = direction.id_direction
+    GROUP BY name_direction;
+    ''', min_mark)
+    for row in cursor.fetchall():
+        print(row)
+    print_answer('')
+
+    '''Вывести список студентов, которые учатся лучше, чем в среднем по всему университету'''
+    cursor.execute('''
+    SELECT last_name, first_name, avg_mark
+    FROM students
+    WHERE avg_mark > (SELECT AVG(avg_mark) FROM students);
+    ''')
+    for row in cursor.fetchall():
+        print(*row, sep=' | '.rjust(10))
+    print_answer('')
+
+    '''Вывод названия направлений, на которых учится больше 3 студентов'''
+    cursor.execute('''
+    SELECT name_direction
+    FROM direction
+    WHERE (SELECT COUNT(*) FROM students WHERE students.id_direction = direction.id_direction) > 3
+    ''')
+    print(cursor.fetchall())
+    print_answer('')
+
+    '''Вывод студентов, лучших по баллу на своем направлении'''
+    cursor.execute('''
+    SELECT name_direction, last_name, first_name, avg_mark
+    FROM students
+    JOIN direction ON students.id_direction = direction.id_direction
+    WHERE students.avg_mark = (SELECT MAX(avg_mark) FROM students WHERE id_direction = direction.id_direction)
+    ''')
+    for row in cursor.fetchall():
+        print(*row, sep=' | '.rjust(3))
+    print_answer('')
+
+    '''Вывод направлений, где средний балл учащихся больше заданного'''
+    min_mark = (70, )
+    cursor.execute('''
+    WITH direction_avg AS (
+    SELECT name_direction, AVG(avg_mark) a
+    FROM direction
+    JOIN students ON direction.id_direction = students.id_direction
+    GROUP BY direction.name_direction
+    )
+    SELECT * FROM direction_avg
+    WHERE direction_avg.a > ?
+    ''', min_mark)
+    for row in cursor.fetchall():
+        print(*row, sep=' | '.rjust(3))
+    print_answer('')
+
+    '''Сравнение каждого студента со средним по его группе'''
+    cursor.execute('''
+    WITH dir_averages AS (
+    SELECT direction.name_direction, students.id_direction, AVG(students.avg_mark) as avg_value
+    FROM students
+    JOIN direction ON students.id_direction = direction.id_direction
+    GROUP BY students.id_direction
+    )
+    SELECT dir_averages.name_direction, students.last_name, students.first_name, students.avg_mark FROM students
+    JOIN dir_averages ON dir_averages.id_direction = students.id_direction
+    WHERE students.avg_mark > dir_averages.avg_value
+    ''')
+    for row in cursor.fetchall():
+        print(*row, sep=' | '.rjust(3))
+    print_answer('')
