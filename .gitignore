@@ -4,3 +4,4 @@ CMakeLists.txt
 red-blue-points/program
 .DS_Store
 program
+__pycache__
