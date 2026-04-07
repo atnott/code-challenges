@@ -13,7 +13,7 @@ private:
 
 public:
     Moon() {
-        std::cout << "enter your date: yyyy-mm-ddThh:mm:ss" << std::endl;
+        std::cout << "enter your date: yyyy-mm-dd" << std::endl;
         std::cin >> dt;
     }
     Moon(int year, int month, int day) : dt(year, month, day) {}
@@ -24,8 +24,7 @@ public:
 
     std::string get_name_file_by_year() {
         char buffer[64];
-        std::snprintf(buffer,  sizeof(buffer), "moon/moon%04d.dat", dt.get_year());
-        std::cout << buffer << std::endl;
+        std::snprintf(buffer, sizeof(buffer), "moon/moon%04d.dat", dt.get_year());
         return buffer;
     }
 
@@ -40,19 +39,26 @@ public:
         std::string header; // скипаем заголовочную строку
         std::getline(file, header);
 
-        std::string rise = "--:--:--", set = "--:--:--", culm_time = "--:--:--";
-        double max_el = -999.0;
-        double prev_el = -999.0;
+        std::string rise = "not found", set = "not found", culm_time = "not found";
+        double max_el = -INT8_MAX;
+        double prev_el = -INT8_MAX;
 
-        std::string ymd;
+        long ymd;
         std::string hms;
         double t, r, el, az, fi, lg;
 
+        long tarhet_date = dt.get_year() * 10000 + dt.get_month() * 100 + dt.get_day();
+
         while (file >> ymd >> hms >> t >> r >> el >> az >> fi >> lg) {
-            if (prev_el != -999.0 && prev_el < 0 && el >= 0) {
+            hms = hms.substr(0, 2) + ':' + hms.substr(2, 2) + ':' + hms.substr(4, 2);
+
+            if (ymd > tarhet_date) break;
+            if (ymd < tarhet_date) continue;
+
+            if (prev_el != -INT8_MAX && prev_el < 0 && el >= 0) {
                 rise = hms;
             }
-            if (prev_el != -999.0 && prev_el > 0 && el <= 0) {
+            if (prev_el != -INT8_MAX && prev_el > 0 && el <= 0) {
                 set = hms;
             }
             if (el > max_el) {
@@ -61,6 +67,9 @@ public:
             }
             prev_el = el;
         }
+        print_results(rise, set, culm_time, max_el);
+    }
+    void print_results(std::string rise, std::string set, std::string culm_time, double max_el) {
         std::cout << dt << std::endl;
         std::cout << "Восход Луны: " << rise << std::endl;
         std::cout << "Кульминация Луны: " << culm_time << " (El: " << max_el << ")" << std::endl;
@@ -70,6 +79,6 @@ public:
 
 int main() {
     using namespace std;
-    Moon m(2001, 01, 01);
+    Moon m;
     m.calculate_events();
 }
