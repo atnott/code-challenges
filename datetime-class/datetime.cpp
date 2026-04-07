@@ -22,17 +22,28 @@ date_time::date_time(std::string str) {
     int cnt = 0;
     for (int i = 0; i < str.length(); i++) {
         if (str[i] == 'T' || str[i] == '-' || str[i] == ':') {
-            cnt++;
+            if (cnt < 5) cnt++;
             continue;
         }
         arr[cnt] += str[i];
     }
-    year = std::stoi(arr[0]);
-    month = std::stoi(arr[1]);
-    day = std::stoi(arr[2]);
-    hour = std::stoi(arr[3]);
-    minute = std::stoi(arr[4]);
-    second = std::stoi(arr[5]);
+    try {
+        year  = (arr[0].empty()) ? 2026 : std::stoi(arr[0]);
+        month = (arr[1].empty()) ? 1    : std::stoi(arr[1]);
+        day   = (arr[2].empty()) ? 1    : std::stoi(arr[2]);
+
+        if (str.find('T') == std::string::npos) {
+            hour = minute = second = 0;
+        } else {
+            hour   = (arr[3].empty()) ? 0 : std::stoi(arr[3]);
+            minute = (arr[4].empty()) ? 0 : std::stoi(arr[4]);
+            second = (arr[5].empty()) ? 0 : std::stoi(arr[5]);
+        }
+    }
+    catch (...) {
+        year = 2026; month = 1; day = 1;
+        hour = minute = second = 0;
+    }
     if (!is_valid()) {
         std::cerr << "invalid date! resetting to 2026-01-01" << std::endl;
         year = 2026; month = 1; day = 1;
