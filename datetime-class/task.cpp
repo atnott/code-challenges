@@ -4,13 +4,13 @@
 #include <iomanip>
 #include <filesystem>
 #include<string>
+#include<sstream>
+#include <chrono>
 
 namespace fs = std::filesystem;
 
 class Moon {
-private:
     date_time dt;
-
 public:
     Moon() {
         std::cout << "enter your date: yyyy-mm-dd" << std::endl;
@@ -24,42 +24,60 @@ public:
 
     std::string get_name_file_by_year() {
         char buffer[64];
-        std::snprintf(buffer, sizeof(buffer), "moon/moon%04d.dat", dt.get_year());
+        std::snprintf(buffer, sizeof(buffer), "Moon/Moon%04d.dat", dt.get_year());
         return buffer;
     }
 
     void calculate_events() {
-        std::ifstream file(get_name_file_by_year());
-
-        if (!file.is_open()) {
-            std::cout << "ОШИБКА: Не могу открыть файл " << std::endl;
+        if (dt.get_year() < 1998 || dt.get_year() > 2023) {
+            std::cerr << "WARNING: year out of range (1998-2023)" << std::endl;
             return;
         }
 
-        std::string header; // скипаем заголовочную строку
+        std::ifstream file(get_name_file_by_year());
+
+        if (!file.is_open()) {
+            std::cout << "WARNING: file not open" << std::endl;
+            return;
+        }
+
+        std::string header;
         std::getline(file, header);
 
         std::string rise = "not found", set = "not found", culm_time = "not found";
-        double max_el = -INT8_MAX;
-        double prev_el = -INT8_MAX;
+        double max_el = -1e9;
+        double prev_el = -1e9;
 
-        long ymd;
-        std::string hms;
-        double t, r, el, az, fi, lg;
+        long target_date = dt.get_year() * 10000 + dt.get_month() * 100 + dt.get_day();
+        bool is_new_format = header.find('T') == std::string::npos;
 
-        long tarhet_date = dt.get_year() * 10000 + dt.get_month() * 100 + dt.get_day();
+        std::string line;
+        while (std::getline(file, line)) {
+            if (line.empty()) continue;
 
-        while (file >> ymd >> hms >> t >> r >> el >> az >> fi >> lg) {
+            std::stringstream ss(line);
+            long ymd;
+            std::string hms;
+            double col3, col4, col5, col6, col7, col8;
+
+            ss >> ymd >> hms;
+
+            if (ymd  > target_date) break;
+            if (ymd < target_date) continue;
+
+            while (hms.length() < 6) hms = "0" + hms;
             hms = hms.substr(0, 2) + ':' + hms.substr(2, 2) + ':' + hms.substr(4, 2);
 
-            if (ymd > tarhet_date) break;
-            if (ymd < tarhet_date) continue;
-
-            if (prev_el != -INT8_MAX && prev_el < 0 && el >= 0) {
-                rise = hms;
+            double el;
+            if (is_new_format) {
+                ss >> col3 >> el >> col5 >> col6 >> col7;
             }
-            if (prev_el != -INT8_MAX && prev_el > 0 && el <= 0) {
-                set = hms;
+            else {
+                ss >> col3 >> col4 >> el >> col6 >> col7;
+            }
+            if (prev_el != -1e9) {
+                if (prev_el > 0 && el <= 0) set = hms;
+                if (prev_el < 0 && el >= 0) rise = hms;
             }
             if (el > max_el) {
                 max_el = el;
@@ -71,14 +89,22 @@ public:
     }
     void print_results(std::string rise, std::string set, std::string culm_time, double max_el) {
         std::cout << dt << std::endl;
-        std::cout << "Восход Луны: " << rise << std::endl;
-        std::cout << "Кульминация Луны: " << culm_time << " (El: " << max_el << ")" << std::endl;
-        std::cout << "Заход Луны: " << set << std::endl;
+        std::cout << "moonrise: " << rise << std::endl;
+        std::cout << "culmination of the Moon: " << culm_time << " (El: " << max_el << ")" << std::endl;
+        std::cout << "moonset: " << set << std::endl;
     }
 };
 
 int main() {
     using namespace std;
     Moon m;
+
+    auto start = chrono::high_resolution_clock::now();
+
     m.calculate_events();
+
+    auto end = chrono::high_resolution_clock::now();
+
+    chrono::duration<double, std::milli> duration = end - start;
+    cout << "lead time: " << duration.count() / 1000 << endl;
 }

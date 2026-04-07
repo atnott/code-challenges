@@ -41,6 +41,7 @@ date_time::date_time(std::string str) {
         }
     }
     catch (...) {
+        std::cerr << "invalid date! resetting to 2026-01-01" << std::endl;
         year = 2026; month = 1; day = 1;
         hour = minute = second = 0;
     }
