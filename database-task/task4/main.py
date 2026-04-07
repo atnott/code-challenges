@@ -14,29 +14,29 @@ with sql.connect("database.db") as connection:
     cursor.execute('DROP TABLE IF EXISTS type_of_training')
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS level_of_study (
-    id_level INTEGER PRIMARY KEY UNIQUE,
-    name_level VARCHAR
+    id_level INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    name_level VARCHAR NOT NULL
     );''')
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS direction (
-    id_direction INTEGER PRIMARY KEY,
-    name_direction VARCHAR  
+    id_direction INTEGER PRIMARY KEY NOT NULL,
+    name_direction VARCHAR NOT NULL  
     );''')
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS type_of_training (
-    id_type INTEGER PRIMARY KEY,
-    name_type VARCHAR
+    id_type INTEGER PRIMARY KEY NOT NULL,
+    name_type VARCHAR NOT NULL
     );''')
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS students (
-    id_student INTEGER PRIMARY KEY UNIQUE,
-    id_level INTEGER,
-    id_direction INTEGER,
-    id_type INTEGER,
-    last_name VARCHAR,
-    first_name VARCHAR,
-    patronymic VARCHAR,
-    avg_mark INTEGER,
+    id_student INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    id_level INTEGER NOT NULL,
+    id_direction INTEGER NOT NULL,
+    id_type INTEGER NOT NULL,
+    last_name VARCHAR NOT NULL,
+    first_name VARCHAR NOT NULL,
+    patronymic VARCHAR NOT NULL,
+    avg_mark INTEGER NOT NULL,
     FOREIGN KEY (id_level) REFERENCES level_of_study (id_level),
     FOREIGN KEY (id_direction) REFERENCES direction (id_direction),
     FOREIGN KEY (id_type) REFERENCES type_of_training (id_type)
