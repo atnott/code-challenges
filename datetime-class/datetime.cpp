@@ -177,3 +177,15 @@ std::istream& operator >> (std::istream& is, date_time& dt) {
     }
     return is;
 }
+
+int date_time::get_year() const {
+    return this->year;
+}
+
+int date_time::get_month() const {
+    return this->month;
+}
+
+int date_time::get_day() const {
+    return this->day;
+}

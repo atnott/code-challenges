@@ -15,6 +15,9 @@ public:
 
     bool is_valid() const;
     void print() const;
+    int get_year() const;
+    int get_month() const;
+    int get_day() const;
 
     bool operator < (const date_time& other) const;
     bool operator > (const date_time& other) const;
