@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-data = [list(map(int, s.split())) for s in open('result.txt', 'r').readlines()]
+data = [list(map(int, s.split())) for s in open('../data/result.txt', 'r').readlines()]
 df = pd.DataFrame([(el[0], el[1] / 1000, el[2]) for el in data], columns=['n', 'seconds', 'result'])
-df.to_csv('answer.csv', index=False)
+df.to_csv('../data/answer.csv', index=False)
 x, y = [x for x, y, z in data], [y / 1000 for x, y, z in data]
 
 '''МНК для квадратичной модели: y = a * (n^2) + b'''
@@ -34,4 +34,5 @@ plt.ylabel('Время выполнения (сек)')
 plt.title('Анализ сложности: Квадратичная модель')
 plt.legend()
 plt.grid(True, linestyle=':', alpha=0.6)
+plt.savefig('../data/answer.png')
 plt.show()

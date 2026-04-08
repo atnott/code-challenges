@@ -6,7 +6,7 @@ using namespace std;
 
 int main() {
     ofstream fout;
-    fout.open("result.txt");
+    fout.open("../data/result.txt");
     for (int i = 1000; i <= 500000; i *= 1.5) {
         auto start = chrono::high_resolution_clock::now();
         int result = find_last(i, 2);
