@@ -41,7 +41,6 @@ Graph::Graph(const std::string &file_name) {
         stringstream ss(line);
         string u_name, v_name;
 
-
         if (ss >> u_name >> v_name) {
             Node* u = find_node(u_name);
             if (u == nullptr) {
