@@ -1,13 +1,19 @@
 #include <iostream>
-#include"graph.hpp"
-using namespace std;
+#include"algorithms.hpp"
 
 int main() {
-    Graph graph("testgraph.txt");
+    using namespace std;
 
-    int cnt_node = 0;
-    for (auto it = graph.begin(); it != graph.end(); ++it) {
-        cnt_node++;
+    try {
+        Graph graph_test("testgraph.txt");
+        Graph graph_1000("1000.csv");
+
+        graph_algo::solve_task(graph_test, "result_test");
+        graph_algo::solve_task(graph_1000, "result_1000");
     }
-    cout << cnt_node << endl;
+    catch (exception& e) {
+        cerr << e.what() << endl;
+    }
+
+    return 0;
 }
