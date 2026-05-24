@@ -2,25 +2,24 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-data = [list(map(int, s.split())) for s in open('../data/result.txt', 'r').readlines()]
+# 1. Загрузка данных из файлов
+data = [list(map(int, s.split())) for s in open('../data/result_array.txt', 'r').readlines()]
 data_list = [list(map(int, s.split())) for s in open('../data/result_list.txt', 'r').readlines()]
+
 df = pd.DataFrame([(el[0], el[1] / 1000, el[2]) for el in data], columns=['n', 'seconds', 'result'])
 df.to_csv('../data/answer.csv', index=False)
+
 x, y = [x for x, y, z in data], [y / 1000 for x, y, z in data]
 x_list, y_list = [x for x, y, z in data_list], [y / 1000 for x, y, z in data_list]
 
 '''МНК для Array'''
 z = [val ** 2 for val in x]
-N = len(x)
 
-sum_zi = sum(z)
-sum_yi = sum(y)
 sum_zi_yi = sum(zi * yi for zi, yi in zip(z, y))
 sum_zi_2 = sum(zi ** 2 for zi in z)
 
-a_fit = (N * sum_zi_yi - sum_zi * sum_yi) / (N * sum_zi_2 - sum_zi ** 2)
-b_fit = (sum_yi - a_fit * sum_zi) / N
-y_mnk = [a_fit * zi + b_fit for zi in z]
+a_fit = sum_zi_yi / sum_zi_2
+y_mnk = [a_fit * zi for zi in z]
 
 '''МНК для List'''
 N_l = len(x_list)
@@ -28,37 +27,41 @@ sum_x_l = sum(x_list)
 sum_y_l = sum(y_list)
 sum_xy_l = sum(xi * yi for xi, yi in zip(x_list, y_list))
 sum_x2_l = sum(xi ** 2 for xi in x_list)
+
 a_l = (N_l * sum_xy_l - sum_x_l * sum_y_l) / (N_l * sum_x2_l - sum_x_l ** 2)
 b_l = (sum_y_l - a_l * sum_x_l) / N_l
+
 y_mnk_list = [a_l * xi + b_l for xi in x_list]
 
 '''Данные для прогноза'''
 x_forecast = np.linspace(max(x), 2_000_000, 500)
-y_forecast = [a_fit * (val**2) + b_fit for val in x_forecast]
+y_forecast = [a_fit * (val**2) for val in x_forecast]
+
 x_forecast_list = np.linspace(max(x_list), 2_000_000, 500)
 y_forecast_list = [a_l * val + b_l for val in x_forecast_list]
 
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(12, 6))
+
 plt.subplot(1, 2, 1)
 plt.plot(x, y, label='Реальные данные', color='blue', linewidth=2)
 plt.plot(x, y_mnk, label='МНК ($O(n^2)$)', color='green', linestyle='--', linewidth=5)
 plt.plot(x_forecast, y_forecast, label='Прогнозируемые данные', color='red', linewidth=2, linestyle='--')
-
 plt.xlabel('Количество элементов (n)')
 plt.ylabel('Время выполнения (сек)')
 plt.title('Array')
+plt.grid(True, linestyle=':', alpha=0.6)
 plt.legend()
 
 plt.subplot(1, 2, 2)
 plt.plot(x_list, y_list, label='Реальные данные', color='blue', linewidth=2)
 plt.plot(x_list, y_mnk_list, label='МНК ($O(n)$)', color='green', linestyle='--', linewidth=5)
 plt.plot(x_forecast_list, y_forecast_list, label='Прогнозируемые данные', color='red', linewidth=2, linestyle='--')
-
 plt.xlabel('Количество элементов (n)')
 plt.ylabel('Время выполнения (сек)')
 plt.title('List')
+plt.grid(True, linestyle=':', alpha=0.6)
 plt.legend()
 
-plt.grid(True, linestyle=':', alpha=0.6)
+plt.tight_layout()
 plt.savefig('../data/answer.png')
 plt.show()
