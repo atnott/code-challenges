@@ -1,4 +1,5 @@
-#include "exponenta.hpp"
+#include"exponenta.hpp"
+#include<iostream>
 
 Exponenta::Exponenta(double coef_a, double coef_b, double coef_c) : a(coef_a), b(coef_b), c(coef_c) {}
 

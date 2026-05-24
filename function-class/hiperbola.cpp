@@ -1,4 +1,5 @@
-#include "hiperbola.hpp"
+#include"hiperbola.hpp"
+#include<iostream>
 
 Hiperbola::Hiperbola(double coef_k, double coef_c) : k(coef_k), c(coef_c) {}
 

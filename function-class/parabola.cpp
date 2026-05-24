@@ -4,7 +4,7 @@
 Parabola::Parabola(double a_coef, double b_coef, double c_coef) : a(a_coef), b(b_coef), c(c_coef) {}
 
 double Parabola::evaluate(double x) const {
-    return a * x + b * x + c;
+    return a * x * x + b * x + c;
 }
 
 void Parabola::print() const {

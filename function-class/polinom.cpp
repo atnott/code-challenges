@@ -1,4 +1,5 @@
-#include "polinom.hpp"
+#include"polinom.hpp"
+#include<iostream>
 
 Polinom::Polinom(const std::vector<double>& coeffs) : coefficients(coeffs) {}
 

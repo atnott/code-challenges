@@ -15,24 +15,28 @@ double Function::integrate(double a, double b, int steps) const {
     return sum * h;
 }
 
-double Function::find_min(double a, double b, double step) const {
-    double min_value = evaluate(a);
-    for (double x = a + step; x <= b; x += step) {
-        double curr = evaluate(x);
-        if (curr < min_value) {
-            min_value = curr;
+double Function::find_min(double a, double b, int steps) const {
+    double h = (b - a) / steps;
+    double min_val = evaluate(a);
+
+    for (int i = 1; i <= steps; ++i) {
+        double current = evaluate(a + i * h);
+        if (current < min_val) {
+            min_val = current;
         }
     }
-    return min_value;
+    return min_val;
 }
 
-double Function::find_max(double a, double b, double step) const {
-    double max_value = evaluate(a);
-    for (double x = a + step; x <= b; x += step) {
-        double curr = evaluate(x);
-        if (curr > max_value) {
-            max_value = curr;
+double Function::find_max(double a, double b, int steps) const {
+    double h = (b - a) / steps;
+    double max_val = evaluate(a);
+
+    for (int i = 1; i <= steps; ++i) {
+        double current = evaluate(a + i * h);
+        if (current > max_val) {
+            max_val = current;
         }
     }
-    return max_value;
+    return max_val;
 }
