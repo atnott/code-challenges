@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 
 int find_last(int n, int step);
 
@@ -12,6 +13,7 @@ private:
     };
     int size;
     Node* head;
+    Node* tail;
     friend int find_last(int n, int step);
 public:
     List();
@@ -36,6 +38,7 @@ template<class T>
 List<T>::List() {
     size = 0;
     head = nullptr;
+    tail = nullptr;
 }
 
 template<class T>
@@ -48,28 +51,29 @@ void List<T>::push_back(T data) {
     if (head == nullptr) {
         head = new Node(data);
 		head->p_next = head;
+        tail = head;
     }
     else {
-        Node* current = this->head;
-        while (current->p_next != head) {
-            current = current->p_next;
-        }
-        current->p_next = new Node(data, head);
+        tail->p_next = new Node(data, head);
+        tail = tail->p_next;
     }
     size++;
 }
 
 template<class T>
 T& List<T>::operator [] (const int index) {
+
+    if (index < 0 || index >= size) {
+        throw std::out_of_range("Index out of range");
+    }
+
     int cnt = 0;
     Node* current = this->head;
-    while (current != nullptr) {
-        if (cnt == index) {
-            return current->data;
-        }
+    while (cnt < index) {
         current = current->p_next;
         cnt++;
     }
+    return current->data;
 }
 
 template<class T>
@@ -78,15 +82,12 @@ void List<T>::pop_front() {
     if (size == 1) {
         delete head;
         head = nullptr;
+        tail = nullptr;
     }
     else {
-        Node* last = head;
-        while (last->p_next != head) {
-            last = last->p_next;
-        }
         Node* temp = head;
         head = head->p_next;
-        last->p_next = head;
+        tail->p_next = head;
         delete temp;
     }
     size--;
@@ -101,15 +102,26 @@ void List<T>::clear() {
 
 template<class T>
 void List<T>::push_front(T data) {
-    head = new Node(data, head);
+    if (head == nullptr) {
+        head = new Node(data);
+        head->p_next = head;
+        tail = head;
+    }
+    else {
+        head = new Node(data, head);
+        tail->p_next = head;
+    }
     size++;
 }
 
 template<class T>
 void List<T>::insert(int index, T data) {
-    if (index < 0 || index >= size) return;
+    if (index < 0 || index > size) return;
     if (index == 0) {
         push_front(data);
+    }
+    else if (index == size) {
+        push_back(data);
     }
     else {
         Node* previous = this->head;
@@ -137,6 +149,11 @@ void List<T>::remove_at(int index) {
             previous = previous->p_next;
         }
         Node* to_delete = previous->p_next;
+
+        if (to_delete == tail) {
+            tail = previous;
+        }
+
         previous->p_next = to_delete->p_next;
         delete to_delete;
         size--;
@@ -149,29 +166,15 @@ void List<T>::pop_back() {
 }
 
 template<class T>
-void List<T>::remove_after(class List<T>::Node* previous) {
+void List<T>::remove_after(typename  List<T>::Node* previous) {
     Node* to_delete = previous->p_next;
-    if (to_delete == head) head = to_delete->p_next;
+    if (to_delete == head) {
+        head = to_delete->p_next;
+    }
+    if (to_delete == tail) {
+        tail = previous;
+    }
     previous->p_next = to_delete->p_next;
     delete to_delete;
     size--;
-}
-
-int find_last(int n, int step) {
-    List<int> list;
-    for (int i{1}; i <= n; i++) list.push_back(i);
-
-    auto* current = list.head;
-
-    while (current->p_next != list.head) {
-        current = current->p_next;
-    }
-
-    while (list.get_size() != 1) {
-        for (int i{0}; i < step - 1; i++) {
-            current = current->p_next;
-        }
-        list.remove_after(current);
-    }
-    return current->data;
 }

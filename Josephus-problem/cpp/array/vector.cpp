@@ -1,5 +1,5 @@
 #include <iostream>
-#include "vector.h"
+#include "../vector.h"
 using namespace std;
 
 Array::Array(int startCapacity)
