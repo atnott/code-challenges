@@ -1,23 +1,13 @@
-#include<iostream>
 #include"function.hpp"
+#include"parabola.hpp"
+#include<iostream>
 
 using std::cout;
 using std::endl;
 
-class TestParabola : public Function {
-public:
-    double evaluate(double x) const {
-        return x * x - 4.0 * x + 3.0;
-    }
-
-    void print() const {
-        cout << "f(x) = x^2 - 4x + 3" << endl;
-    }
-};
-
 int main() {
-    Function* func = new TestParabola();
 
+    Function* func = new Parabola(1.0, -4.0, 3.0);
     func->print();
 
     // вычисление значения в точке
