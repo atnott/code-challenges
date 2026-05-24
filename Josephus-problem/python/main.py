@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-# 1. Загрузка данных из файлов
 data = [list(map(int, s.split())) for s in open('../data/result_array.txt', 'r').readlines()]
 data_list = [list(map(int, s.split())) for s in open('../data/result_list.txt', 'r').readlines()]
 
