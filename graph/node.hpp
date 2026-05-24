@@ -10,7 +10,7 @@ class Node {
     void remove_neighbor(Node* neighbor) {neighbors.erase(neighbor);}
 
 public:
-    Node (std::string& name) : name(name) {}
+    Node (const std::string& name) : name(name) {}
     const std::string get_name() const {return name;}
 
     using node_iterator = std::set<Node*>::const_iterator;

@@ -6,6 +6,7 @@ class Graph {
     Node* find_node(const std::string& name) const;
 public:
 
+    Graph() = default;
     Graph(const std::string& file_name);
     ~Graph();
 
