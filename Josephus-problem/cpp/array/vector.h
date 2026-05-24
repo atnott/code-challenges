@@ -34,5 +34,3 @@ public:
 
     friend ostream& operator <<(ostream& out, const Array& arr);
 };
-
-int find_last(int n, int step);
