@@ -19,5 +19,8 @@ int main() {
         }
         cout << endl;
     }
+
+    cout << "Sum of column 3: " << file.sumColumn(3) << endl;
+
     return 0;
 }

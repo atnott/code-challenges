@@ -2,6 +2,7 @@
 #include"formatRowFile.hpp"
 #include<string>
 #include<fstream>
+#include<stdexcept>
 
 template <class T>
 class TextFile {
@@ -13,6 +14,7 @@ public:
 	TextFile(std::string path, bool isWriteMode);
 	void setFilePath(std::string path) { filePath = path; }
 	void saveToFile();
+	double sumColumn(size_t index);
 };
 
 template <class T>
@@ -40,4 +42,20 @@ void TextFile<T>::saveToFile() {
 		}
 		ofs << std::endl;
 	}
+}
+
+template <class T>
+double TextFile<T>::sumColumn(size_t index) {
+	double total_sum = 0.0;
+	for (auto& v : data) {
+		if (index < v.columns.size()) {
+			try {
+				double temp = std::stod(v.columns[index]);
+				total_sum += temp;
+			}
+			catch (...) {}
+		}
+		else continue;
+	}
+	return total_sum;
 }
