@@ -22,5 +22,9 @@ int main() {
 
     cout << "Sum of column 3: " << file.sumColumn(3) << endl;
 
+    file.sortByColumn(3, false);
+    file.setFilePath("STARLINK/chirp_test_sort.dat");
+    file.saveToFile();
+
     return 0;
 }

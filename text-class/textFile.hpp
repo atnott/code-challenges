@@ -15,6 +15,7 @@ public:
 	void setFilePath(std::string path) { filePath = path; }
 	void saveToFile();
 	double sumColumn(size_t index);
+	void sortByColumn(size_t index, bool asc = true);
 };
 
 template <class T>
@@ -58,4 +59,21 @@ double TextFile<T>::sumColumn(size_t index) {
 		else continue;
 	}
 	return total_sum;
+}
+
+template <class T>
+void TextFile<T>::sortByColumn(size_t index, bool asc) {
+    if (data.empty()) return;
+    for (size_t i = 0; i < data.size() - 1; ++i) {
+        for (size_t j = i + 1; j < data.size(); ++j) {
+            if (index < data[i].columns.size() && index < data[j].columns.size()) {
+                if (asc && data[i].columns[index] > data[j].columns[index]) {
+                    std::swap(data[i], data[j]);
+                }
+                else if (!asc && data[i].columns[index] < data[j].columns[index]) {
+                    std::swap(data[i], data[j]);
+                }
+            }
+        }
+    }
 }
