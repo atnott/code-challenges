@@ -6,6 +6,8 @@
 
 namespace graph_algo {
     using std::set;
+    using std::vector;
+
     Graph get_component_bfs(Node* start, set<Node*>& unvisited) {
         Graph component; // хранение узлов текущего графа
         std::queue<Node*> q; // очередь для bfs
@@ -49,18 +51,29 @@ namespace graph_algo {
         return component;
     }
 
-    void solve_task(const Graph& g, const std::string& output) {
+    vector<Graph> find_all_components(const Graph& g) {
+        vector<Graph> components;
         set<Node*> unvisited;
+
         for (auto it = g.begin(); it != g.end(); ++it) {
             unvisited.insert(*it);
         }
 
-        int index = 1;
-
         while (!unvisited.empty()) {
             Node* start_node = *unvisited.begin();
             Graph component = get_component_bfs(start_node, unvisited);
+            components.push_back(component);
+        }
 
+        return components;
+    }
+
+    void solve_task(const Graph& g, const std::string& output) {
+        // вектор всех компонент связности
+        vector<Graph> all_parts = find_all_components(g);
+
+        int index = 1;
+        for (const Graph& component : all_parts) {
             std::string file_name = output + "_part_" + std::to_string(index++) + ".txt";
             std::ofstream file(file_name);
 
@@ -78,6 +91,8 @@ namespace graph_algo {
                     }
                 }
                 file.close();
+            } else {
+                std::cerr << "Ошибка открытия файла: " << file_name << std::endl;
             }
         }
     }
