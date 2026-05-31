@@ -1,4 +1,4 @@
-#include"SudokuModel.hpp"
+#include"../include/SudokuModel.hpp"
 
 SudokuModel::SudokuModel()
 {
