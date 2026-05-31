@@ -94,6 +94,25 @@ bool SudokuModel::checkWin() const
 }
 
 bool SudokuModel::solve() {
-    return false;
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            if (board[i][j].value == 0)
+            {
+                for (int num = 1; num < 10; num++)
+                {
+                    if (isValidMove(i, j, num)) // если ход валидный, временно присваиваем ячейке значение num
+                    {
+                        board[i][j].value = num;
+                        if (solve()) return true;
+                        else board[i][j].value = 0;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
