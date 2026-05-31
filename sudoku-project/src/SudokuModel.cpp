@@ -1,8 +1,7 @@
 #include"../include/SudokuModel.hpp"
 #include<vector>
 #include<algorithm>
-#include<ctime>
-#include<cstdlib>
+#include<random>
 
 SudokuModel::SudokuModel()
 {
@@ -155,11 +154,16 @@ void SudokuModel::generatePuzzle(int difficulty)
 {
     clearBoard();
 
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::uniform_int_distribution<int> dist(0, 8);
+
     std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     int indexes[]{0, 3, 6};
     for (int index : indexes)
     {
-        std::random_shuffle(nums.begin(), nums.end());
+        std::shuffle(nums.begin(), nums.end(), g);
 
         int count = 0;
         for (int i = index; i < index + 3; i++)
@@ -174,13 +178,16 @@ void SudokuModel::generatePuzzle(int difficulty)
     solve();
 
     int cnt = 0;
-    while (cnt != difficulty)
+    int attempts = 0;
+
+    while (cnt != difficulty && attempts < 1000)
     {
+        attempts++;
         int row, column;
         do
         {
-            row = rand() % 9;
-            column = rand() % 9;
+            row = dist(g);
+            column = dist(g);
         } while (board[row][column].value == 0);
 
         int backup = board[row][column].value;
