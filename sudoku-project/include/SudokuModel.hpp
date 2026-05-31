@@ -13,11 +13,14 @@ class SudokuModel
 {
     array<array<Cell, 9>, 9> board;
 public:
+    SudokuModel();
     bool setCell(int row, int column, int value);
     bool isValidMove(int row, int column, int value) const;
     bool checkWin() const;
     bool solve();
+    bool isCorrectIndex(int row, int column) const;
+    bool isCorrectValue(int value) const;
 
     int getValue(int row, int column) const;
-    bool isCellPresent(int row, int column) const;
+    bool isCellPreset(int row, int column) const;
 };
