@@ -1,15 +1,12 @@
 #include"../include/SudokuModel.hpp"
+#include<vector>
+#include<algorithm>
+#include<ctime>
+#include<cstdlib>
 
 SudokuModel::SudokuModel()
 {
-    for (int i = 0; i < 9; i++)
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            board[i][j].value = 0;
-            board[i][j].isPreset = false;
-        }
-    }
+    clearBoard();
 }
 
 bool SudokuModel::isCorrectIndex(int row, int column) const
@@ -116,3 +113,94 @@ bool SudokuModel::solve() {
     return true;
 }
 
+int SudokuModel::countSolutions(int& solutionsCount)
+{
+    if (solutionsCount > 1) return solutionsCount;
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            if (board[i][j].value == 0)
+            {
+                for (int num = 1; num < 10; num++)
+                {
+                    if (isValidMove(i, j, num))
+                    {
+                        board[i][j].value = num;
+                        countSolutions(solutionsCount);
+                        board[i][j].value = 0;
+                    }
+                }
+                return solutionsCount;
+            }
+        }
+    }
+    solutionsCount++;
+    return solutionsCount;
+}
+
+void SudokuModel::clearBoard()
+{
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            board[i][j].value = 0;
+            board[i][j].isPreset = false;
+        }
+    }
+}
+
+void SudokuModel::generatePuzzle(int difficulty)
+{
+    clearBoard();
+
+    std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int indexes[]{0, 3, 6};
+    for (int index : indexes)
+    {
+        std::random_shuffle(nums.begin(), nums.end());
+
+        int count = 0;
+        for (int i = index; i < index + 3; i++)
+        {
+            for (int j = index; j < index + 3; j++)
+            {
+                board[i][j].value = nums[count++];
+            }
+        }
+    }
+
+    solve();
+
+    int cnt = 0;
+    while (cnt != difficulty)
+    {
+        int row, column;
+        do
+        {
+            row = rand() % 9;
+            column = rand() % 9;
+        } while (board[row][column].value == 0);
+
+        int backup = board[row][column].value;
+        board[row][column].value = 0;
+
+        int score = 0;
+        countSolutions(score);
+
+        if (score != 1) // решений стало 0 или больше 1
+        {
+            board[row][column].value = backup;
+        }
+        else cnt++;
+    }
+
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            if (board[i][j].value != 0) board[i][j].isPreset = true;
+        }
+    }
+}

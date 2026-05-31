@@ -12,6 +12,7 @@ struct Cell
 class SudokuModel
 {
     array<array<Cell, 9>, 9> board;
+    int countSolutions(int& solutionsCount);
 public:
     SudokuModel();
     bool setCell(int row, int column, int value);
@@ -23,4 +24,6 @@ public:
 
     int getValue(int row, int column) const;
     bool isCellPreset(int row, int column) const;
+    void generatePuzzle(int difficulty);
+    void clearBoard();
 };
