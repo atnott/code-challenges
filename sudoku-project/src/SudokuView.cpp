@@ -16,14 +16,19 @@ void SudokuView::printBoard(const SudokuModel& model) const
         for (int col = 0; col < 9; col++)
         {
             int val = model.getValue(row, col);
+
+            // Замена пустых ячеек (0) на более читаемые точки
             if (val == 0) cout << ". ";
             else cout << val << " ";
 
+            // Каждые 3 столбца отрисовываем вертикальный разделитель блоков
             if ((col + 1) % 3 == 0) {
                 cout << "| ";
             }
         }
         cout << endl;
+
+        // Каждые 3 строки отрисовываем горизонтальный разделитель блоков
         if ((row + 1) % 3 == 0)
         {
             cout << "  +-------+-------+-------+" << endl;
