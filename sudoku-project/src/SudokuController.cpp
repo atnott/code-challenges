@@ -12,7 +12,7 @@ void SudokuController::start()
     int difficulty = 0;
     int levels[]{30, 40, 50};
     string difficultyInput;
-    cout << "Введите уровень сложности игры, где: \n1 - Easy(30 лунок) \n2 - Medium(40 лунок) \n3 - Hard(50 лунок)";
+    cout << "Введите уровень сложности игры, где: \n1 - Easy(30 лунок) \n2 - Medium(40 лунок) \n3 - Hard(50 лунок)\n";
     cin >> difficultyInput;
     cin.ignore();
     difficulty = levels[stoi(difficultyInput) - 1];
@@ -27,14 +27,27 @@ void SudokuController::start()
             cout << "Поздравляю! Ты победил!" << endl;
             break;
         }
-        cout << "Введите ваш ход вида \'A5 9\' \nДоступные команды: \'exit\' - выйти из игры / \'solve\' - показать единственное решение";
+        cout << "Введите ваш ход вида \'A5 9\' \nДоступные команды: \'exit\' - выйти из игры / \'solve\' - показать единственное решение" << endl;
         string input;
         std::getline(cin, input);
 
         if (input == "exit")
             break;
         else if (input == "solve")
+        {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    if (!model.isCellPreset(i, j)) {
+                        model.setCell(i, j, 0);
+                    }
+                }
+            }
             model.solve();
+            cout << "\033[2J\033[1;1H";
+            view.printBoard(model);
+            cout << "Игра завершена авторешением!" << endl;
+            break;
+        }
         else
         {
             int row, col, value;
@@ -44,13 +57,13 @@ void SudokuController::start()
             {
                 if (!model.setCell(row, col, value))
                 {
-                    cout << "Нельзя менять стартовые ячейки! Нажмите Enter для продолжения...";
+                    cout << "Нельзя менять стартовые ячейки! Нажмите Enter для продолжения..." << endl;
                     cin.get();
                 }
             }
             else
             {
-                cout << "Неверный формат команды! Нажмите Enter для продолжения...";
+                cout << "Неверный формат команды! Нажмите Enter для продолжения..." << endl;
                 cin.get();
             }
         }
