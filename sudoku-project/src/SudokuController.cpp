@@ -14,7 +14,8 @@ void SudokuController::start()
     string difficultyInput;
     cout << "Введите уровень сложности игры, где: \n1 - Easy(30 лунок) \n2 - Medium(40 лунок) \n3 - Hard(50 лунок)\n";
     cin >> difficultyInput;
-    cin.ignore();
+    cin.ignore(); // Очистка буфера от символа '\n'
+
     difficulty = levels[stoi(difficultyInput) - 1];
 
     model.generatePuzzle(difficulty);
@@ -35,6 +36,7 @@ void SudokuController::start()
             break;
         else if (input == "solve")
         {
+            // Очистка всех пользовательских ходов перед авторешением
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 9; j++) {
                     if (!model.isCellPreset(i, j)) {
