@@ -3,7 +3,7 @@ CXXFLAGS = -Wall -Wextra -std=c++17 -Iinclude
 
 TARGET = sudoku_game
 
-SRCS = src/main.cpp src/SudokuModel.cpp src/SudokuView.cpp
+SRCS = src/main.cpp src/SudokuModel.cpp src/SudokuView.cpp src/SudokuCollector.cpp
 
 all: $(TARGET)
 
