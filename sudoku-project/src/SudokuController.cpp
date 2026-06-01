@@ -10,17 +10,28 @@ using std::cin;
 void SudokuController::start()
 {
     int difficulty = 0;
-    int levels[]{30, 40, 50};
     string difficultyInput;
     cout << "Введите уровень сложности игры, где: \n1 - Easy(30 лунок) \n2 - Medium(40 лунок) \n3 - Hard(50 лунок)\n";
     cin >> difficultyInput;
     cin.ignore(); // Очистка буфера от символа '\n'
 
-    difficulty = levels[stoi(difficultyInput) - 1];
+    char choice = difficultyInput[0];
+    if (choice == '1') difficulty = 30;
+    else if (choice == '2') difficulty = 40;
+    else if (choice == '3') difficulty = 50;
+    else {
+        cout << "Неверный выбор! Автоматически выбран легкий уровень (30)" << endl;
+        difficulty = 30;
+    }
 
     model.generatePuzzle(difficulty);
     while (isRunning)
     {
+        if (!cin) {
+            cout << "Критическая ошибка ввода! Завершение игры!" << endl;
+            break;
+        }
+
         cout << "\033[2J\033[1;1H";
         view.printBoard(model);
         if (model.checkWin())
@@ -74,6 +85,11 @@ void SudokuController::start()
 
 void SudokuController::parseInput(const std::string& input, int& row, int& col, int& value)
 {
+    // Сразу ставим дефолтные некорректные значения на случай сбоя
+    row = -1;
+    col = -1;
+    value = -1;
+
     std::stringstream ss(input);
     string rowAndCol;
     if (ss >> rowAndCol >> value)
