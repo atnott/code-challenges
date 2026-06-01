@@ -8,6 +8,9 @@ SudokuModel::SudokuModel()
     clearBoard();
 }
 
+/**
+ * @details Безопасная проверка границ массива, защищает от Segmentation Fault
+ */
 bool SudokuModel::isCorrectIndex(int row, int column) const
 {
     if (row >= 0 && row < 9 && column >= 0 && column < 9)
@@ -20,6 +23,10 @@ bool SudokuModel::isCorrectValue(int value) const
     return value > 0 && value < 10;
 }
 
+/**
+ * @details Реализует инкапсуляцию данных. Внешний код не имеет прямого
+ * доступа к матрице `board`, работа с ней идет только через этот безопасный метод
+ */
 int SudokuModel::getValue(int row, int column) const
 {
     if (isCorrectIndex(row, column))
@@ -38,7 +45,7 @@ bool SudokuModel::setCell(int row, int column, int value)
 {
     if (isCorrectIndex(row, column))
     {
-        if (!board[row][column].isPreset)
+        if (!board[row][column].isPreset) // Защита начальных подсказок
         {
             if (isCorrectValue(value) || value == 0)
             {
@@ -47,7 +54,7 @@ bool SudokuModel::setCell(int row, int column, int value)
             }
         }
     }
-    return false;
+    return false; // Отказ в совершении хода
 }
 
 bool SudokuModel::isValidMove(int row, int column, int value) const
@@ -73,7 +80,7 @@ bool SudokuModel::isValidMove(int row, int column, int value) const
             }
         }
     }
-    return true;
+    return true; // Ошибок не найдено, ход допустим
 }
 
 bool SudokuModel::checkWin() const
@@ -82,6 +89,7 @@ bool SudokuModel::checkWin() const
     {
         for (int j = 0; j < 9; j++)
         {
+            // Если осталась пустая ячейка или нарушено правило — победа не засчитывается
             if (board[i][j].value == 0) return false;
             if (!isValidMove(i, j, board[i][j].value)) return false;
         }
@@ -105,11 +113,11 @@ bool SudokuModel::solve() {
                         else board[i][j].value = 0;
                     }
                 }
-                return false;
+                return false; // Нет подходящих чисел — тупик
             }
         }
     }
-    return true;
+    return true; // Вся матрица успешно заполнена
 }
 
 int SudokuModel::countSolutions(int& solutionsCount)
@@ -161,6 +169,8 @@ void SudokuModel::generatePuzzle(int difficulty)
 
     std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     int indexes[]{0, 3, 6};
+
+    // Фаза 1: Случайное заполнение трех диагональных квадратов 3х3
     for (int index : indexes)
     {
         std::shuffle(nums.begin(), nums.end(), g);
@@ -175,8 +185,10 @@ void SudokuModel::generatePuzzle(int difficulty)
         }
     }
 
+    // Фаза 2: Получение полностью заполненного валидного поля
     solve();
 
+    // Фаза 3: Удаление случайных ячеек с проверкой на единственность решения
     int cnt = 0;
     int attempts = 0;
 
@@ -196,13 +208,14 @@ void SudokuModel::generatePuzzle(int difficulty)
         int score = 0;
         countSolutions(score);
 
-        if (score != 1) // решений стало 0 или больше 1
+        if (score != 1) // Решений стало 0 или больше 1
         {
-            board[row][column].value = backup;
+            board[row][column].value = backup; // Возвращаем назад, если решение перестало быть единственным
         }
-        else cnt++;
+        else cnt++; // Успешно удалили ячейку
     }
 
+    // Фиксация оставшихся подсказок
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
