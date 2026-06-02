@@ -1,6 +1,8 @@
 #include"../include/SudokuController.hpp"
 #include<iostream>
 #include<sstream>
+#include <thread>
+#include <chrono>
 
 using std::string;
 using std::cout;
@@ -39,7 +41,7 @@ void SudokuController::start()
             cout << "Поздравляю! Ты победил!" << endl;
             break;
         }
-        cout << "Введите ваш ход вида \'A5 9\' \nДоступные команды: \'exit\' - выйти из игры / \'solve\' - показать единственное решение" << endl;
+        cout << "Введите ваш ход вида \'A5 9\' \nДоступные команды: \'exit\' - выйти из игры / \'solve\' - показать единственное решение / \'demo\' - показать постепенное решение" << endl;
         string input;
         std::getline(cin, input);
 
@@ -61,6 +63,8 @@ void SudokuController::start()
             cout << "Игра завершена авторешением!" << endl;
             break;
         }
+        else if (input == "demo")
+            runDemo();
         else
         {
             int row, col, value;
@@ -97,4 +101,30 @@ void SudokuController::parseInput(const std::string& input, int& row, int& col, 
         col = std::toupper(rowAndCol[0]) - 'A';
         row = rowAndCol[1] - '1';
     }
+}
+
+void SudokuController::runDemo()
+{
+    SudokuModel demoCopy = model;
+    demoCopy.solve();
+
+    for (int row = 0; row < 9; row++)
+    {
+        for (int col = 0; col < 9; col++)
+        {
+            if (model.getValue(row, col) == 0)
+            {
+                int correctValue = demoCopy.getValue(row, col);
+                model.setCell(row, col, correctValue);
+                cout << "\033[2J\033[1;1H";
+                view.printBoard(model);
+                string symbols = "ABCDEFGHI";
+                cout << "[DEMO] Компьютер заполнил ячейку " << symbols[col] << row + 1 << " цифрой " << correctValue << endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
+        }
+    }
+    cout << "DEMO Режим закончен! Нажмите Enter для продолжения..." << endl;
+    cin.ignore(10000, '\n');
+    cin.get();
 }
