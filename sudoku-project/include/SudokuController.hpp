@@ -48,4 +48,6 @@ public:
      * 3. Каждые 500 мс добавляет одну ячейку в основное поля из копии
      */
     void runDemo();
+
+    bool loadAndSolveFromFile(const std::string& filename);
 };

@@ -19,7 +19,10 @@ struct Cell
  */
 class SudokuModel
 {
-    array<array<Cell, 9>, 9> board; ///< Поле для игры, массив 9 на 9
+public:
+    static const int BOARD_SIZE = 9;
+private:
+    array<array<Cell, SudokuModel::BOARD_SIZE>, SudokuModel::BOARD_SIZE> board; ///< Поле для игры, массив 9 на 9
 
     /**
      * @brief Рекурсивный подсчет количества решений для текущего состояния игры
@@ -29,6 +32,7 @@ class SudokuModel
      */
     int countSolutions(int& solutionsCount);
 public:
+
     /**
      * @brief Конструктор по умолчанию, инициализирует пустое поле
      */
@@ -98,4 +102,6 @@ public:
      * @brief Сброс игрового поля - очистка всех значений и флагов
      */
     void clearBoard();
+
+    void setInitialCell(int row, int column, int value);
 };

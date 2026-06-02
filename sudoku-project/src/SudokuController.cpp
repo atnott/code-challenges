@@ -3,6 +3,7 @@
 #include<sstream>
 #include <thread>
 #include <chrono>
+#include <fstream>
 
 using std::string;
 using std::cout;
@@ -41,7 +42,7 @@ void SudokuController::start()
             cout << "Поздравляю! Ты победил!" << endl;
             break;
         }
-        cout << "Введите ваш ход вида \'A5 9\' \nДоступные команды: \'exit\' - выйти из игры / \'solve\' - показать единственное решение / \'demo\' - показать постепенное решение" << endl;
+        cout << "Введите ваш ход вида \'A5 9\' \nДоступные команды: \'exit\' - выйти из игры / \'solve\' - показать единственное решение / \'demo\' - показать постепенное решение / \'load\' - загрузить судоку из файла" << endl;
         string input;
         std::getline(cin, input);
 
@@ -50,8 +51,8 @@ void SudokuController::start()
         else if (input == "solve")
         {
             // Очистка всех пользовательских ходов перед авторешением
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 9; j++) {
+            for (int i = 0; i < SudokuModel::BOARD_SIZE; i++) {
+                for (int j = 0; j < SudokuModel::BOARD_SIZE; j++) {
                     if (!model.isCellPreset(i, j)) {
                         model.setCell(i, j, 0);
                     }
@@ -65,6 +66,18 @@ void SudokuController::start()
         }
         else if (input == "demo")
             runDemo();
+        else if (input == "load")
+        {
+            cout << "Введите имя файла (например filename.txt)" << endl;
+            string filename;
+            cin >> filename;
+            cin.ignore();
+
+            if (loadAndSolveFromFile(filename))
+            {
+                break;
+            }
+        }
         else
         {
             int row, col, value;
@@ -108,9 +121,9 @@ void SudokuController::runDemo()
     SudokuModel demoCopy = model;
     demoCopy.solve();
 
-    for (int row = 0; row < 9; row++)
+    for (int row = 0; row < SudokuModel::BOARD_SIZE; row++)
     {
-        for (int col = 0; col < 9; col++)
+        for (int col = 0; col < SudokuModel::BOARD_SIZE; col++)
         {
             if (model.getValue(row, col) == 0)
             {
@@ -127,4 +140,47 @@ void SudokuController::runDemo()
     cout << "DEMO Режим закончен! Нажмите Enter для продолжения..." << endl;
     cin.ignore(10000, '\n');
     cin.get();
+}
+
+bool SudokuController::loadAndSolveFromFile(const std::string& filename)
+{
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        cout << "Ошибка: Не удалось открыть файл '" << filename << "'!" << endl;
+        cout << "Нажмите Enter, чтобы вернуться в игру..." << endl;
+        cin.get();
+        return false;
+    }
+
+    model.clearBoard();
+
+    for (int row = 0; row < SudokuModel::BOARD_SIZE; row++)
+    {
+        for (int col = 0; col < SudokuModel::BOARD_SIZE; col++)
+        {
+            int val;
+            if (!(file >> val))
+            {
+                cout << "Ошибка: Файл поврежден или содержит недостаточно данных!" << endl;
+                cout << "Нажмите Enter, чтобы продолжить..." << endl;
+                model.clearBoard();
+                file.close();
+                cin.get();
+                return false;
+            }
+            model.setInitialCell(row, col, val);
+        }
+    }
+    file.close();
+    model.solve();
+
+    cout << "\033[2J\033[1;1H";
+    view.printBoard(model);
+    cout << "Судоку из файла '" << filename << "' успешно загружено и РЕШЕНО!" << endl;
+    cout << "Нажмите Enter для выхода..." << endl;
+
+    cin.get();
+    return true;
 }

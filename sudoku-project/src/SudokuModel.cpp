@@ -13,14 +13,14 @@ SudokuModel::SudokuModel()
  */
 bool SudokuModel::isCorrectIndex(int row, int column) const
 {
-    if (row >= 0 && row < 9 && column >= 0 && column < 9)
+    if (row >= 0 && row < SudokuModel::BOARD_SIZE && column >= 0 && column < SudokuModel::BOARD_SIZE)
         return true;
     return false;
 }
 
 bool SudokuModel::isCorrectValue(int value) const
 {
-    return value > 0 && value < 10;
+    return value > 0 && value < SudokuModel::BOARD_SIZE + 1;
 }
 
 /**
@@ -61,18 +61,19 @@ bool SudokuModel::isValidMove(int row, int column, int value) const
 {
     if (isCorrectIndex(row, column) && isCorrectValue(value))
     {
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < SudokuModel::BOARD_SIZE; i++)
         {
             if (i != column && board[row][i].value == value) return false;
             if (i != row && board[i][column].value == value) return false;
         }
 
-        int startRow = (row / 3) * 3;
-        int startColumn = (column / 3) * 3;
+        int step = sqrt(SudokuModel::BOARD_SIZE); // шаг для нашей матрицы
+        int startRow = (row / step) * step;
+        int startColumn = (column / step) * step;
 
-        for (int i = startRow; i < startRow + 3; i++)
+        for (int i = startRow; i < startRow + step; i++)
         {
-            for (int j = startColumn; j < startColumn + 3; j++)
+            for (int j = startColumn; j < startColumn + step; j++)
             {
                 if (i == row && j == column) continue;
                 if (board[i][j].value == value)
@@ -85,9 +86,9 @@ bool SudokuModel::isValidMove(int row, int column, int value) const
 
 bool SudokuModel::checkWin() const
 {
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < SudokuModel::BOARD_SIZE; i++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int j = 0; j < SudokuModel::BOARD_SIZE; j++)
         {
             // Если осталась пустая ячейка или нарушено правило — победа не засчитывается
             if (board[i][j].value == 0) return false;
@@ -98,13 +99,13 @@ bool SudokuModel::checkWin() const
 }
 
 bool SudokuModel::solve() {
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < SudokuModel::BOARD_SIZE; i++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int j = 0; j < SudokuModel::BOARD_SIZE; j++)
         {
             if (board[i][j].value == 0)
             {
-                for (int num = 1; num < 10; num++)
+                for (int num = 1; num < SudokuModel::BOARD_SIZE + 1; num++)
                 {
                     if (isValidMove(i, j, num)) // если ход валидный, временно присваиваем ячейке значение num
                     {
@@ -123,13 +124,13 @@ bool SudokuModel::solve() {
 int SudokuModel::countSolutions(int& solutionsCount)
 {
     if (solutionsCount > 1) return solutionsCount;
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < SudokuModel::BOARD_SIZE; i++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int j = 0; j < SudokuModel::BOARD_SIZE; j++)
         {
             if (board[i][j].value == 0)
             {
-                for (int num = 1; num < 10; num++)
+                for (int num = 1; num < SudokuModel::BOARD_SIZE + 1; num++)
                 {
                     if (isValidMove(i, j, num))
                     {
@@ -148,9 +149,9 @@ int SudokuModel::countSolutions(int& solutionsCount)
 
 void SudokuModel::clearBoard()
 {
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < SudokuModel::BOARD_SIZE; i++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int j = 0; j < SudokuModel::BOARD_SIZE; j++)
         {
             board[i][j].value = 0;
             board[i][j].isPreset = false;
@@ -167,8 +168,9 @@ void SudokuModel::generatePuzzle(int difficulty)
 
     std::uniform_int_distribution<int> dist(0, 8);
 
-    std::vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    int indexes[]{0, 3, 6};
+    std::vector<int> nums;
+    for (int i = 1; i < SudokuModel::BOARD_SIZE + 1; i++) nums.push_back(i);
+    int indexes[3] = {0, 3, 6};
 
     // Фаза 1: Случайное заполнение трех диагональных квадратов 3х3
     for (int index : indexes)
@@ -176,9 +178,9 @@ void SudokuModel::generatePuzzle(int difficulty)
         std::shuffle(nums.begin(), nums.end(), g);
 
         int count = 0;
-        for (int i = index; i < index + 3; i++)
+        for (int i = index; i < index + sqrt(SudokuModel::BOARD_SIZE); i++)
         {
-            for (int j = index; j < index + 3; j++)
+            for (int j = index; j < index + sqrt(SudokuModel::BOARD_SIZE); j++)
             {
                 board[i][j].value = nums[count++];
             }
@@ -216,11 +218,24 @@ void SudokuModel::generatePuzzle(int difficulty)
     }
 
     // Фиксация оставшихся подсказок
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < SudokuModel::BOARD_SIZE; i++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int j = 0; j < SudokuModel::BOARD_SIZE; j++)
         {
             if (board[i][j].value != 0) board[i][j].isPreset = true;
         }
+    }
+}
+
+void SudokuModel::setInitialCell(int row, int column, int value)
+{
+    // 1. Проверяем, что индексы не выходят за пределы поля (0-8)
+    // 2. Проверяем, что значение валидно (1-9) или это пустая клетка (0)
+    if (isCorrectIndex(row, column) && (isCorrectValue(value) || value == 0))
+    {
+        board[row][column].value = value;
+
+        // Переводим в булево значение: если value != 0, то true, иначе false
+        board[row][column].isPreset = (value != 0);
     }
 }
